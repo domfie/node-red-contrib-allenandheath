@@ -15,7 +15,7 @@ module.exports = function(RED)
         }
         else if(value != false){
             if(value != true) {
-                network.server.write(value);
+                sendMessage(sender, network, value); //network.server.write(value);
                 sendSuccess(sender, network, "Sent!");
             }
             else {
@@ -45,7 +45,8 @@ module.exports = function(RED)
         this.midiChannel = (config.midiChannel - 1).toString(16);
         this.ipAddress = config.ipAddress;
         this.port = config.port;
-        this.server;
+        this.server = [];//this.server;
+        this.server.write = () => {return true}; //Dummy function
         this.connected = false;
         this.connectionCheck;
         this.errorCallbacks = [];
@@ -56,15 +57,17 @@ module.exports = function(RED)
         this.node = this;
         var node = this.node;
         this.recentlySentMessage = false;
+        node.consoles[node.console].initialConnection(node.server, node.midiChannel); //init Data
         //On close disconnect
         this.on("close", function() {
-            node.server.end();
-            node.server.destroy();
-            node.connected = false;
-            node.server = new tcp.Socket();
+            //node.server.end();
+            //node.server.destroy();
+            //node.connected = false;
+            //node.server = new tcp.Socket();
             node.consoles[node.console].reset();
-            clearInterval(this.connectionCheck);
+            //clearInterval(this.connectionCheck);
         });
+        /*
 
         var tryToConnect = function() {
             node.log("Attempting Inital Connection");
@@ -109,7 +112,7 @@ module.exports = function(RED)
                 }
             });
         }
-        tryToConnect();
+        tryToConnect();*/
     }     
     RED.nodes.registerType("allenandheath-AHNetwork", AHNetwork);
 }
